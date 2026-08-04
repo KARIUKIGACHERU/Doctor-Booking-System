@@ -1,7 +1,7 @@
 # Afya kwa wote
 
 A doctor appointment booking web app for the Kenyan market, built with
-plain HTML, CSS, and vanilla JavaScript. Patients can search for doctors,
+plain HTML, CSS, and JavaScript. Patients can search for doctors,
 open a booking panel to pick a date and time, and manage their upcoming
 appointments — all stored locally in the browser (no backend).
 
