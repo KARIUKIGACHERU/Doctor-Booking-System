@@ -484,3 +484,53 @@ function closePanel() {
   if (backdrop) backdrop.classList.remove("open");
   document.body.style.overflow = "";
 }
+function renderDateTabs() {
+  const days = next7Days();
+  const wrap = document.getElementById("panel-dates");
+  panelState.dateIso = days[panelState.dayIndex].iso;
+  wrap.innerHTML = days
+    .map(
+      (d, i) => `
+      <button type="button" class="date-tab ${i === panelState.dayIndex ? "active" : ""}" data-idx="${i}">
+        <span class="dow">${d.dow}</span>
+        <span class="dom">${d.dom}</span>
+      </button>`,
+    )
+    .join("");
+
+  wrap.querySelectorAll(".date-tab").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      panelState.dayIndex = Number(btn.dataset.idx);
+      panelState.time = null;
+      renderDateTabs();
+      renderSlots();
+    });
+  });
+}
+
+function renderSlots() {
+  const days = next7Days();
+  panelState.dateIso = days[panelState.dayIndex].iso;
+  const slots = getSlotsForDate(panelState.doctor, panelState.dateIso, panelState.dayIndex);
+  const wrap = document.getElementById("panel-slots");
+
+  if (!slots.length) {
+    wrap.innerHTML = `<div class="slot-empty">No slots available this day — try another date.</div>`;
+    return;
+  }
+
+  wrap.innerHTML = slots
+    .map(
+      (t) =>
+        `<button type="button" class="slot-btn ${t === panelState.time ? "active" : ""}" data-time="${t}">${t}</button>`,
+    )
+    .join("");
+
+  wrap.querySelectorAll(".slot-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      panelState.time = btn.dataset.time;
+      wrap.querySelectorAll(".slot-btn").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+    });
+  });
+}
