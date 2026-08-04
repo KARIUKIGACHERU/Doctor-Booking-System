@@ -371,3 +371,116 @@ document.addEventListener("DOMContentLoaded", () => {
 
     applyFilters(); 
 }
+
+/* ---------------- booking panel ---------------- */
+
+let panelState = {
+  doctor: null,
+  dayIndex: 0,
+  dateIso: null,
+  time: null,
+};
+
+function ensurePanel() {
+  if (document.getElementById("booking-panel")) return;
+
+  const backdrop = document.createElement("div");
+  backdrop.className = "panel-backdrop";
+  backdrop.id = "panel-backdrop";
+
+  const panel = document.createElement("div");
+  panel.className = "booking-panel";
+  panel.id = "booking-panel";
+  panel.setAttribute("role", "dialog");
+  panel.setAttribute("aria-modal", "true");
+  panel.setAttribute("aria-labelledby", "panel-doctor-name");
+  panel.innerHTML = `
+    <div class="panel-header">
+      <div class="panel-header-top">
+        <span style="font-weight:700;">Book appointment</span>
+        <button class="panel-close" id="panel-close" aria-label="Close booking panel">✕</button>
+      </div>
+      <div class="panel-doctor">
+        <div class="avatar" id="panel-avatar"></div>
+        <div>
+          <h3 id="panel-doctor-name"></h3>
+          <p id="panel-doctor-sub"></p>
+        </div>
+      </div>
+    </div>
+    <div class="panel-body">
+      <p class="panel-section-title">Choose a date</p>
+      <div class="date-tabs" id="panel-dates"></div>
+      <p class="panel-section-title">Choose a time</p>
+      <div class="slot-grid" id="panel-slots"></div>
+      <p class="panel-section-title">Your details</p>
+      <div class="field">
+        <label for="pf-name">Full name</label>
+        <input type="text" id="pf-name" placeholder="Jane Wanjiku" required />
+      </div>
+      <div class="field">
+        <label for="pf-phone">Phone number</label>
+        <input type="tel" id="pf-phone" placeholder="+254 7xx xxx xxx" required />
+      </div>
+      <div class="field">
+        <label for="pf-notes">Reason for visit (optional)</label>
+        <textarea id="pf-notes" rows="2" placeholder="Briefly tell the doctor why you're visiting"></textarea>
+      </div>
+    </div>
+    <div class="panel-footer">
+      <div class="panel-fee-row">
+        <span>Consultation fee</span>
+        <strong id="panel-fee"></strong>
+      </div>
+      <button class="btn btn-primary btn-block" id="panel-confirm">Confirm booking</button>
+    </div>`;
+
+  document.body.appendChild(backdrop);
+  document.body.appendChild(panel);
+
+  backdrop.addEventListener("click", closePanel);
+  document.getElementById("panel-close").addEventListener("click", closePanel);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && panel.classList.contains("open")) closePanel();
+  });
+  document.getElementById("panel-confirm").addEventListener("click", confirmBooking);
+}
+
+function openPanel(doctorId) {
+  const doctor = DOCTORS.find((d) => d.id === doctorId);
+  if (!doctor) return;
+  ensurePanel();
+
+  panelState = { doctor, dayIndex: 0, dateIso: null, time: null };
+
+  const col = specialtyColor(doctor.specialty);
+  const avatar = document.getElementById("panel-avatar");
+  avatar.style.background = col.bg;
+  avatar.style.color = col.fg;
+  avatar.textContent = initials(doctor.name);
+
+  document.getElementById("panel-doctor-name").textContent = doctor.name;
+  document.getElementById(
+    "panel-doctor-sub",
+  ).textContent = `${doctor.specialty} · ${doctor.hospital}`;
+  document.getElementById("panel-fee").textContent = fmtMoney(doctor.fee);
+
+  renderDateTabs();
+  renderSlots();
+
+  document.getElementById("pf-name").value = "";
+  document.getElementById("pf-phone").value = "";
+  document.getElementById("pf-notes").value = "";
+
+  document.getElementById("booking-panel").classList.add("open");
+  document.getElementById("panel-backdrop").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+function closePanel() {
+  const panel = document.getElementById("booking-panel");
+  const backdrop = document.getElementById("panel-backdrop");
+  if (panel) panel.classList.remove("open");
+  if (backdrop) backdrop.classList.remove("open");
+  document.body.style.overflow = "";
+}
