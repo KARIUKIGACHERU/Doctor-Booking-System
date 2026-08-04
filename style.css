@@ -1,6 +1,6 @@
 :root {
-  --primary: #2c6298;
-  --primary-light: #4a90e2;
+  --primary:  #970747;
+  --primary-light: #970747;
   --primary-dark: #1f456d;
   --bg: #f7f9fb;
   --surface: #ffffff;
@@ -239,7 +239,9 @@ button {
 /* ---------- Hero ---------- */
 
 .hero {
-  background: linear-gradient(180deg, #eef5fc 0%, var(--bg) 100%);
+  background:
+    linear-gradient(100deg, rgba(15, 30, 48, 0.6) 0%, rgba(15, 30, 48, 0.3) 55%, rgba(15, 30, 48, 0.1) 100%),
+    url("./doctor.jpg") center 25% / cover no-repeat;
   padding: 56px 20px 40px;
   border-bottom: 1px solid var(--border);
 }
@@ -290,15 +292,17 @@ button {
   font-size: 2.5em;
   line-height: 1.15;
   margin: 0 0 16px;
-  color: var(--primary-dark);
+  color: #ffffff;
   letter-spacing: -0.5px;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45)
 }
 
 .hero p.lead {
   font-size: 1.12em;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.92);
   margin: 0 0 26px;
   max-width: 46ch;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.4);
 }
 
 .hero-actions {
@@ -310,23 +314,27 @@ button {
 
 .trust-row {
   display: flex;
-  gap: 22px;
-  flex-wrap: wrap;
-}
-
-.trust-item {
-  display: flex;
   align-items: center;
   gap: 8px;
   font-size: 0.9em;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.9);
   font-weight: 600;
+}
+
+.trust-item {
+   display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9em;
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 600;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
 }
 
 .trust-item svg {
   width: 18px;
   height: 18px;
-  stroke: var(--primary);
+  stroke: #ffffff;
   flex-shrink: 0;
 }
 
@@ -536,7 +544,7 @@ section {
 }
 
 footer {
-  background-color: var(--primary-dark);
+  background-color: #970747;
   color: rgba(255, 255, 255, 0.85);
   padding: 30px 20px;
   text-align: center;
@@ -897,7 +905,7 @@ footer a {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
 }
-/* ---------- Booking panel (simple, no animation) ---------- */
+/* Booking panel  */
 
 .panel-backdrop {
   position: fixed;
