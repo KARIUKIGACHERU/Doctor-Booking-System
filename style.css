@@ -236,3 +236,157 @@ button {
   opacity: 0.55;
   cursor: not-allowed;
 }
+/* ---------- Hero ---------- */
+
+.hero {
+  background: linear-gradient(180deg, #eef5fc 0%, var(--bg) 100%);
+  padding: 56px 20px 40px;
+  border-bottom: 1px solid var(--border);
+}
+
+.hero-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 40px;
+  align-items: center;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--success-light);
+  color: var(--success);
+  font-weight: 700;
+  font-size: 0.82em;
+  padding: 6px 12px;
+  border-radius: 999px;
+  margin-bottom: 16px;
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--success);
+  animation: pulse-beat 1.6s ease-in-out infinite;
+}
+
+@keyframes pulse-beat {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.55;
+  }
+}
+
+.hero h1 {
+  font-size: 2.5em;
+  line-height: 1.15;
+  margin: 0 0 16px;
+  color: var(--primary-dark);
+  letter-spacing: -0.5px;
+}
+
+.hero p.lead {
+  font-size: 1.12em;
+  color: var(--muted);
+  margin: 0 0 26px;
+  max-width: 46ch;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+
+.trust-row {
+  display: flex;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+
+.trust-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9em;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.trust-item svg {
+  width: 18px;
+  height: 18px;
+  stroke: var(--primary);
+  flex-shrink: 0;
+}
+
+/* quick search card in hero */
+
+.quick-search {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 26px;
+  border: 1px solid var(--border);
+}
+
+.quick-search h2 {
+  margin: 0 0 4px;
+  font-size: 1.15em;
+  color: var(--primary-dark);
+}
+
+.quick-search .sub {
+  margin: 0 0 18px;
+  color: var(--muted);
+  font-size: 0.92em;
+}
+
+.search-field {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.search-field input {
+  flex: 1;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--primary-dark);
+  padding: 8px 13px;
+  border-radius: 999px;
+  font-size: 0.85em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-height: 38px;
+}
+
+.chip:hover {
+  border-color: var(--primary-light);
+}
+
+.chip.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
