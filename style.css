@@ -390,3 +390,37 @@ button {
   border-color: var(--primary);
   color: white;
 }
+/* ---------- Inputs ---------- */
+
+input[type="text"],
+input[type="search"],
+input[type="tel"],
+input[type="number"],
+select,
+textarea {
+  font: inherit;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--ink);
+  width: 100%;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--primary-light);
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.88em;
+  margin-bottom: 6px;
+  color: var(--primary-dark);
+}
+
+.field {
+  margin-bottom: 14px;
+}
