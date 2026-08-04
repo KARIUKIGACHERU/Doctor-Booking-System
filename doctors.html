@@ -35,3 +35,23 @@
         <p>Search and filter by specialty, hospital, and fee to find the right fit.</p>
       </div>
     </div>
+    <div class="toolbar">
+      <div class="toolbar-inner">
+        <div class="toolbar-search">
+          <input
+            type="search"
+            id="doctor-search"
+            placeholder="Search by doctor name or specialty…"
+            aria-label="Search doctors"
+          />
+        </div>
+        <div class="toolbar-row">
+          <div class="filter-chips" id="specialty-chips" aria-label="Filter by specialty"></div>
+          <select id="hospital-filter" aria-label="Filter by hospital"></select>
+          <select id="sort-filter" aria-label="Sort results">
+            <option value="rating">Sort: Top rated</option>
+            <option value="fee-low">Sort: Fee (low to high)</option>
+            <option value="fee-high">Sort: Fee (high to low)</option>
+          </select>
+        </div>
+    </div>
