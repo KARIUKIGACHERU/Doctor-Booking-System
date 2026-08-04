@@ -226,3 +226,57 @@ function getSlotsForDate(doctor, iso, dayIndex) {
 
   return pool.filter((t) => !booked.includes(t));
 }
+/* ---------------- doctor card rendering ---------------- */
+
+// Builds the HTML markup for one doctor card. Called by renderDoctorGrid,
+// which replaces the grid's innerHTML every time a search or filter runs
+// (DOM manipulation driven by user input, not a page reload).
+function doctorCardHTML(doc) {
+  const col = specialtyColor(doc.specialty);
+  const av = AVAILABILITY_LABELS[doc.availability];
+  return `
+    <article class="doctor-card" data-id="${doc.id}">
+      <div class="doctor-top">
+        <div class="avatar" style="background:${col.bg};color:${col.fg}">${initials(
+    doc.name,
+  )}</div>
+        <div class="doctor-id">
+          <h3>${doc.name}</h3>
+          <div class="specialty">${doc.specialty}</div>
+        </div>
+      </div>
+      <div class="doctor-meta">
+        <div class="row">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h1m4 0h1m-6 4h1m4 0h1m-6 4h1m4 0h1"/></svg>
+          ${doc.hospital}
+        </div>
+        <div class="row">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+          ${doc.location}
+        </div>
+      </div>
+      <span class="badge ${av.cls}">
+        ${doc.availability === "today" ? '<span class="pulse-dot" style="background:currentColor"></span>' : ""}
+        ${av.text}
+      </span>
+      <div class="doctor-footer">
+        <div>
+          <div class="rating">${starIcon()} ${doc.rating} <span class="count">(${doc.reviews})</span></div>
+          <div class="fee">${fmtMoney(doc.fee)} <span>/ visit</span></div>
+        </div>
+        <button class="btn btn-primary btn-sm js-book" data-id="${doc.id}">Book</button>
+      </div>
+    </article>`;
+}
+
+function renderDoctorGrid(list, targetEl) {
+  if (!list.length) {
+    targetEl.innerHTML = `
+      <div class="empty-state">
+        <h3>No doctors match your search</h3>
+        <p>Try a different specialty, hospital, or fee range.</p>
+      </div>`;
+    return;
+  }
+  targetEl.innerHTML = list.map(doctorCardHTML).join("");
+}
