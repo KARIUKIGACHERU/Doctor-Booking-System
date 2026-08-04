@@ -138,6 +138,7 @@ const AVAILABILITY_LABELS = {
   few: { text: "Few slots left", cls: "badge-few" },
   week: { text: "Next available this week", cls: "badge-week" },
 };
+
 /* ---------------- helpers ---------------- */
 
 // Returns up to 2 uppercase initials from a doctor's name, used for the
@@ -226,6 +227,7 @@ function getSlotsForDate(doctor, iso, dayIndex) {
 
   return pool.filter((t) => !booked.includes(t));
 }
+
 /* ---------------- doctor card rendering ---------------- */
 
 // Builds the HTML markup for one doctor card. Called by renderDoctorGrid,
@@ -279,97 +281,6 @@ function renderDoctorGrid(list, targetEl) {
     return;
   }
   targetEl.innerHTML = list.map(doctorCardHTML).join("");
-}
-
-/* ---------------- page bootstraps ---------------- */
-
-document.addEventListener("DOMContentLoaded", () => {
-  ensurePanel();
-
-  document.body.addEventListener("click", (e) => {
-    const bookBtn = e.target.closest(".js-book");
-    if (bookBtn) openPanel(bookBtn.dataset.id);
-  });
-
-
-  /* ---- doctors.html search/filter ---- */
-  const grid = document.getElementById("doctor-grid");
-  if (grid) {
-    const searchInput = document.getElementById("doctor-search");
-    const hospitalSelect = document.getElementById("hospital-filter");
-    const sortSelect = document.getElementById("sort-filter");
-    const resultsCount = document.getElementById("results-count");
-    const specialtyChips = document.getElementById("specialty-chips");
-
-    // populate hospital dropdown
-    const hospitals = [...new Set(DOCTORS.map((d) => d.hospital))].sort();
-    hospitalSelect.innerHTML =
-      '<option value="">All hospitals</option>' +
-      hospitals.map((h) => `<option value="${h}">${h}</option>`).join("");
-
-    // specialty chips
-    const specialties = [...new Set(DOCTORS.map((d) => d.specialty))].sort();
-    specialtyChips.innerHTML =
-      `<button class="chip active" data-specialty="">All specialties</button>` +
-      specialties
-        .map((s) => `<button class="chip" data-specialty="${s}">${s}</button>`)
-        .join("");
-
-    const params = new URLSearchParams(window.location.search);
-    const state = {
-      q: params.get("q") || "",
-      specialty: params.get("specialty") || "",
-      hospital: "",
-      sort: "rating",
-    };
-
-    if (state.q) searchInput.value = state.q;
-
-    function applyFilters() {
-      let list = DOCTORS.filter((d) => {
-        const q = state.q.toLowerCase();
-        const matchesQ =
-          !q ||
-          d.name.toLowerCase().includes(q) ||
-          d.specialty.toLowerCase().includes(q);
-        const matchesSpecialty = !state.specialty || d.specialty === state.specialty;
-        const matchesHospital = !state.hospital || d.hospital === state.hospital;
-        return matchesQ && matchesSpecialty && matchesHospital;
-      });
-
-      if (state.sort === "rating") list.sort((a, b) => b.rating - a.rating);
-      if (state.sort === "fee-low") list.sort((a, b) => a.fee - b.fee);
-      if (state.sort === "fee-high") list.sort((a, b) => b.fee - a.fee);
-
-      renderDoctorGrid(list, grid);
-      resultsCount.textContent = `${list.length} doctor${list.length === 1 ? "" : "s"} found`;
-
-      // reflect active specialty chip
-      specialtyChips.querySelectorAll(".chip").forEach((c) => {
-        c.classList.toggle("active", c.dataset.specialty === state.specialty);
-      });
-    }
-
-    searchInput.addEventListener("input", () => {
-      state.q = searchInput.value;
-      applyFilters();
-    });
-    hospitalSelect.addEventListener("change", () => {
-      state.hospital = hospitalSelect.value;
-      applyFilters();
-    });
-    sortSelect.addEventListener("change", () => {
-      state.sort = sortSelect.value;
-      applyFilters();
-    });
-    specialtyChips.addEventListener("click", (e) => {
-      const chip = e.target.closest(".chip");
-      if (!chip) return;
-      state.specialty = chip.dataset.specialty;
-      applyFilters();
-    });
-
-    applyFilters(); 
 }
 
 /* ---------------- booking panel ---------------- */
@@ -484,6 +395,7 @@ function closePanel() {
   if (backdrop) backdrop.classList.remove("open");
   document.body.style.overflow = "";
 }
+
 function renderDateTabs() {
   const days = next7Days();
   const wrap = document.getElementById("panel-dates");
@@ -534,6 +446,7 @@ function renderSlots() {
     });
   });
 }
+
 function confirmBooking() {
   const { doctor, dateIso, time } = panelState;
   const name = document.getElementById("pf-name").value.trim();
@@ -575,6 +488,7 @@ function confirmBooking() {
 
   document.dispatchEvent(new CustomEvent("appointments:changed"));
 }
+
 /* ---------------- toast ---------------- */
 
 function showToast(title, body) {
@@ -601,6 +515,12 @@ function showToast(title, body) {
 }
 
 /* ---------------- dashboard (booking.html) ---------------- */
+
+// Renders the "Your appointments" list on booking.html from whatever is
+// currently saved in localStorage, and wires up Cancel buttons that
+// remove an appointment and re-render. This is the dynamic, cross-page
+// link back to bookings made from the doctors.html search page.
+function renderDashboard(targetEl) {
   const appointments = getAppointments().sort((a, b) =>
     (a.date + a.time).localeCompare(b.date + b.time),
   );
@@ -647,6 +567,112 @@ function showToast(title, body) {
   });
 }
 
+/* ---------------- page bootstraps ---------------- */
+
+document.addEventListener("DOMContentLoaded", () => {
+  ensurePanel();
+
+  document.body.addEventListener("click", (e) => {
+    const bookBtn = e.target.closest(".js-book");
+    if (bookBtn) openPanel(bookBtn.dataset.id);
+  });
+
+  /* ---- index.html hero quick search ---- */
+  const heroForm = document.getElementById("hero-search-form");
+  if (heroForm) {
+    heroForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const q = document.getElementById("hero-search-input").value.trim();
+      window.location.href = "doctors.html" + (q ? "?q=" + encodeURIComponent(q) : "");
+    });
+    document.querySelectorAll(".js-quick-specialty").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        window.location.href =
+          "doctors.html?specialty=" + encodeURIComponent(chip.dataset.specialty);
+      });
+    });
+  }
+
+  /* ---- doctors.html search/filter ---- */
+  const grid = document.getElementById("doctor-grid");
+  if (grid) {
+    const searchInput = document.getElementById("doctor-search");
+    const hospitalSelect = document.getElementById("hospital-filter");
+    const sortSelect = document.getElementById("sort-filter");
+    const resultsCount = document.getElementById("results-count");
+    const specialtyChips = document.getElementById("specialty-chips");
+
+    // populate hospital dropdown
+    const hospitals = [...new Set(DOCTORS.map((d) => d.hospital))].sort();
+    hospitalSelect.innerHTML =
+      '<option value="">All hospitals</option>' +
+      hospitals.map((h) => `<option value="${h}">${h}</option>`).join("");
+
+    // specialty chips
+    const specialties = [...new Set(DOCTORS.map((d) => d.specialty))].sort();
+    specialtyChips.innerHTML =
+      `<button class="chip active" data-specialty="">All specialties</button>` +
+      specialties
+        .map((s) => `<button class="chip" data-specialty="${s}">${s}</button>`)
+        .join("");
+
+    const params = new URLSearchParams(window.location.search);
+    const state = {
+      q: params.get("q") || "",
+      specialty: params.get("specialty") || "",
+      hospital: "",
+      sort: "rating",
+    };
+
+    if (state.q) searchInput.value = state.q;
+
+    function applyFilters() {
+      let list = DOCTORS.filter((d) => {
+        const q = state.q.toLowerCase();
+        const matchesQ =
+          !q ||
+          d.name.toLowerCase().includes(q) ||
+          d.specialty.toLowerCase().includes(q);
+        const matchesSpecialty = !state.specialty || d.specialty === state.specialty;
+        const matchesHospital = !state.hospital || d.hospital === state.hospital;
+        return matchesQ && matchesSpecialty && matchesHospital;
+      });
+
+      if (state.sort === "rating") list.sort((a, b) => b.rating - a.rating);
+      if (state.sort === "fee-low") list.sort((a, b) => a.fee - b.fee);
+      if (state.sort === "fee-high") list.sort((a, b) => b.fee - a.fee);
+
+      renderDoctorGrid(list, grid);
+      resultsCount.textContent = `${list.length} doctor${list.length === 1 ? "" : "s"} found`;
+
+      // reflect active specialty chip
+      specialtyChips.querySelectorAll(".chip").forEach((c) => {
+        c.classList.toggle("active", c.dataset.specialty === state.specialty);
+      });
+    }
+
+    searchInput.addEventListener("input", () => {
+      state.q = searchInput.value;
+      applyFilters();
+    });
+    hospitalSelect.addEventListener("change", () => {
+      state.hospital = hospitalSelect.value;
+      applyFilters();
+    });
+    sortSelect.addEventListener("change", () => {
+      state.sort = sortSelect.value;
+      applyFilters();
+    });
+    specialtyChips.addEventListener("click", (e) => {
+      const chip = e.target.closest(".chip");
+      if (!chip) return;
+      state.specialty = chip.dataset.specialty;
+      applyFilters();
+    });
+
+    applyFilters();
+  }
+
   /* ---- booking.html: doctor picker + dashboard ---- */
   const bookingSelect = document.getElementById("booking-doctor-select");
   if (bookingSelect) {
@@ -672,20 +698,5 @@ function showToast(title, body) {
   if (dashboard) {
     renderDashboard(dashboard);
     document.addEventListener("appointments:changed", () => renderDashboard(dashboard));
-  }
-  /* ---- index.html hero quick search ---- */
-  const heroForm = document.getElementById("hero-search-form");
-  if (heroForm) {
-    heroForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const q = document.getElementById("hero-search-input").value.trim();
-      window.location.href = "doctors.html" + (q ? "?q=" + encodeURIComponent(q) : "");
-    });
-    document.querySelectorAll(".js-quick-specialty").forEach((chip) => {
-      chip.addEventListener("click", () => {
-        window.location.href =
-          "doctors.html?specialty=" + encodeURIComponent(chip.dataset.specialty);
-      });
-    });
   }
 });
