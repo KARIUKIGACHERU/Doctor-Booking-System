@@ -601,12 +601,6 @@ function showToast(title, body) {
 }
 
 /* ---------------- dashboard (booking.html) ---------------- */
-
-// Renders the "Your appointments" list on booking.html from whatever is
-// currently saved in localStorage, and wires up Cancel buttons that
-// remove an appointment and re-render. This is the dynamic, cross-page
-// link back to bookings made from the doctors.html search page.
-function renderDashboard(targetEl) {
   const appointments = getAppointments().sort((a, b) =>
     (a.date + a.time).localeCompare(b.date + b.time),
   );
@@ -679,3 +673,19 @@ function renderDashboard(targetEl) {
     renderDashboard(dashboard);
     document.addEventListener("appointments:changed", () => renderDashboard(dashboard));
   }
+  /* ---- index.html hero quick search ---- */
+  const heroForm = document.getElementById("hero-search-form");
+  if (heroForm) {
+    heroForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const q = document.getElementById("hero-search-input").value.trim();
+      window.location.href = "doctors.html" + (q ? "?q=" + encodeURIComponent(q) : "");
+    });
+    document.querySelectorAll(".js-quick-specialty").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        window.location.href =
+          "doctors.html?specialty=" + encodeURIComponent(chip.dataset.specialty);
+      });
+    });
+  }
+});
