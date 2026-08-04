@@ -897,3 +897,210 @@ footer a {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
 }
+/* ---------- Booking panel (simple, no animation) ---------- */
+
+.panel-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 27, 36, 0.45);
+  z-index: 90;
+  display: none;
+}
+
+.panel-backdrop.open {
+  display: block;
+}
+
+.booking-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 440px;
+  max-width: 92vw;
+  background: var(--surface);
+  z-index: 91;
+  border-left: 1px solid var(--border);
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.booking-panel.open {
+  display: flex;
+}
+
+.panel-header {
+  background: linear-gradient(135deg, var(--primary-light), var(--primary));
+  color: white;
+  padding: 20px 22px;
+  flex-shrink: 0;
+}
+
+.panel-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.panel-close {
+  background: rgba(255, 255, 255, 0.16);
+  border: none;
+  color: white;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  cursor: pointer;
+  flex-shrink: 0;
+  font-size: 1.1em;
+  line-height: 1;
+}
+
+.panel-close:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.panel-doctor {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 14px;
+}
+
+.panel-doctor .avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  font-size: 1em;
+}
+
+.panel-doctor h3 {
+  margin: 0;
+  font-size: 1.02em;
+}
+
+.panel-doctor p {
+  margin: 2px 0 0;
+  font-size: 0.85em;
+  opacity: 0.9;
+}
+
+.panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 22px 10px;
+}
+
+.panel-section-title {
+  font-weight: 700;
+  color: var(--primary-dark);
+  font-size: 0.92em;
+  margin: 0 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.date-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  margin-bottom: 20px;
+}
+
+.date-tab {
+  flex-shrink: 0;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 10px 14px;
+  text-align: center;
+  cursor: pointer;
+  min-width: 62px;
+}
+
+.date-tab .dow {
+  display: block;
+  font-size: 0.72em;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.date-tab .dom {
+  display: block;
+  font-size: 1.15em;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.date-tab.active {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.date-tab.active .dow,
+.date-tab.active .dom {
+  color: white;
+}
+
+.slot-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.slot-btn {
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  border-radius: 9px;
+  padding: 10px 6px;
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+  min-height: 44px;
+}
+
+.slot-btn:hover {
+  border-color: var(--primary-light);
+}
+
+.slot-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.slot-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.88em;
+  padding: 14px 0;
+}
+
+.panel-footer {
+  border-top: 1px solid var(--border);
+  padding: 16px 22px;
+  flex-shrink: 0;
+  background: var(--surface);
+}
+
+.panel-fee-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 0.92em;
+  color: var(--muted);
+}
+
+.panel-fee-row strong {
+  color: var(--primary-dark);
+  font-size: 1.15em;
+}
