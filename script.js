@@ -138,3 +138,91 @@ const AVAILABILITY_LABELS = {
   few: { text: "Few slots left", cls: "badge-few" },
   week: { text: "Next available this week", cls: "badge-week" },
 };
+/* ---------------- helpers ---------------- */
+
+// Returns up to 2 uppercase initials from a doctor's name, used for the
+// avatar circle in place of a photo (e.g. "Dr. Amara Achieng" -> "AA").
+function initials(name) {
+  return name
+    .replace("Dr.", "")
+    .trim()
+    .split(" ")
+    .map((p) => p[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+}
+
+function specialtyColor(specialty) {
+  return SPECIALTY_COLORS[specialty] || { bg: "#e3edff", fg: "#2c5aa0" };
+}
+
+function starIcon() {
+  return '<svg viewBox="0 0 20 20"><polygon points="10,1 12.6,7 19,7.6 14.2,11.9 15.6,18.2 10,14.9 4.4,18.2 5.8,11.9 1,7.6 7.4,7"/></svg>';
+}
+
+// Reads the saved appointments array from localStorage. This is what makes
+// bookings made on doctors.html show up on booking.html: both pages read
+// and write the same key, so data persists across page loads and page
+// navigation without a backend.
+function getAppointments() {
+  try {
+    return JSON.parse(localStorage.getItem(APPT_KEY) || "[]");
+  } catch (e) {
+    return [];
+  }
+}
+
+// Writes the full appointments array back to localStorage.
+function saveAppointments(list) {
+  localStorage.setItem(APPT_KEY, JSON.stringify(list));
+}
+
+// Formats a fee as Kenyan Shillings, e.g. 3500 -> "KSh 3,500"
+function fmtMoney(n) {
+  return "KSh " + Number(n).toLocaleString("en-KE");
+}
+
+function next7Days() {
+  const days = [];
+  const dow = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const today = new Date();
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+    const iso = d.toISOString().slice(0, 10);
+    days.push({
+      iso,
+      dow: i === 0 ? "Today" : dow[d.getDay()],
+      dom: d.getDate(),
+    });
+  }
+  return days;
+}
+
+function fmtDateLabel(iso) {
+  const d = new Date(iso + "T00:00:00");
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
+/**
+ * Slots for a given doctor + date, minus already-booked slots for that
+ * doctor+date, and reduced in count for "few"/"week" availability doctors
+ * to simulate scarcity.
+ */
+function getSlotsForDate(doctor, iso, dayIndex) {
+  let pool = BASE_SLOTS.slice();
+
+  if (doctor.availability === "few") {
+    pool = pool.filter((_, i) => i % 3 === 0).slice(0, 5);
+  } else if (doctor.availability === "week") {
+    if (dayIndex < 2) return [];
+    pool = pool.filter((_, i) => i % 2 === 0).slice(0, 6);
+  }
+
+  const booked = getAppointments()
+    .filter((a) => a.doctorId === doctor.id && a.date === iso)
+    .map((a) => a.time);
+
+  return pool.filter((t) => !booked.includes(t));
+}
