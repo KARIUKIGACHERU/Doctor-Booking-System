@@ -534,3 +534,44 @@ function renderSlots() {
     });
   });
 }
+function confirmBooking() {
+  const { doctor, dateIso, time } = panelState;
+  const name = document.getElementById("pf-name").value.trim();
+  const phone = document.getElementById("pf-phone").value.trim();
+  const notes = document.getElementById("pf-notes").value.trim();
+
+  if (!time) {
+    alert("Please choose an available time slot.");
+    return;
+  }
+  if (!name || !phone) {
+    alert("Please enter your name and phone number.");
+    return;
+  }
+
+  const appointments = getAppointments();
+  appointments.push({
+    id: "a" + Date.now(),
+    doctorId: doctor.id,
+    doctorName: doctor.name,
+    specialty: doctor.specialty,
+    hospital: doctor.hospital,
+    location: doctor.location,
+    fee: doctor.fee,
+    date: dateIso,
+    time,
+    patientName: name,
+    patientPhone: phone,
+    notes,
+    createdAt: new Date().toISOString(),
+  });
+  saveAppointments(appointments);
+
+  closePanel();
+  showToast(
+    "Appointment confirmed",
+    `${doctor.name} · ${fmtDateLabel(dateIso)} at ${time}`,
+  );
+
+  document.dispatchEvent(new CustomEvent("appointments:changed"));
+}
