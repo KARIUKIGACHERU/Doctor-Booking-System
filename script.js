@@ -575,3 +575,27 @@ function confirmBooking() {
 
   document.dispatchEvent(new CustomEvent("appointments:changed"));
 }
+/* ---------------- toast ---------------- */
+
+function showToast(title, body) {
+  let toast = document.getElementById("app-toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.className = "toast";
+    toast.id = "app-toast";
+    toast.innerHTML = `
+      <div class="icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>
+      </div>
+      <div>
+        <h4 id="toast-title"></h4>
+        <p id="toast-body"></p>
+      </div>`;
+    document.body.appendChild(toast);
+  }
+  document.getElementById("toast-title").textContent = title;
+  document.getElementById("toast-body").textContent = body;
+  toast.classList.add("show");
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => toast.classList.remove("show"), 4200);
+}
