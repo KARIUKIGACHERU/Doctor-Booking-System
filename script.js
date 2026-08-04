@@ -280,3 +280,92 @@ function renderDoctorGrid(list, targetEl) {
   }
   targetEl.innerHTML = list.map(doctorCardHTML).join("");
 }
+/* ---------------- page bootstraps ---------------- */
+
+document.addEventListener("DOMContentLoaded", () => {
+  ensurePanel();
+
+  document.body.addEventListener("click", (e) => {
+    const bookBtn = e.target.closest(".js-book");
+    if (bookBtn) openPanel(bookBtn.dataset.id);
+  });
+
+
+  /* ---- doctors.html search/filter ---- */
+  const grid = document.getElementById("doctor-grid");
+  if (grid) {
+    const searchInput = document.getElementById("doctor-search");
+    const hospitalSelect = document.getElementById("hospital-filter");
+    const sortSelect = document.getElementById("sort-filter");
+    const resultsCount = document.getElementById("results-count");
+    const specialtyChips = document.getElementById("specialty-chips");
+
+    // populate hospital dropdown
+    const hospitals = [...new Set(DOCTORS.map((d) => d.hospital))].sort();
+    hospitalSelect.innerHTML =
+      '<option value="">All hospitals</option>' +
+      hospitals.map((h) => `<option value="${h}">${h}</option>`).join("");
+
+    // specialty chips
+    const specialties = [...new Set(DOCTORS.map((d) => d.specialty))].sort();
+    specialtyChips.innerHTML =
+      `<button class="chip active" data-specialty="">All specialties</button>` +
+      specialties
+        .map((s) => `<button class="chip" data-specialty="${s}">${s}</button>`)
+        .join("");
+
+    const params = new URLSearchParams(window.location.search);
+    const state = {
+      q: params.get("q") || "",
+      specialty: params.get("specialty") || "",
+      hospital: "",
+      sort: "rating",
+    };
+
+    if (state.q) searchInput.value = state.q;
+
+    function applyFilters() {
+      let list = DOCTORS.filter((d) => {
+        const q = state.q.toLowerCase();
+        const matchesQ =
+          !q ||
+          d.name.toLowerCase().includes(q) ||
+          d.specialty.toLowerCase().includes(q);
+        const matchesSpecialty = !state.specialty || d.specialty === state.specialty;
+        const matchesHospital = !state.hospital || d.hospital === state.hospital;
+        return matchesQ && matchesSpecialty && matchesHospital;
+      });
+
+      if (state.sort === "rating") list.sort((a, b) => b.rating - a.rating);
+      if (state.sort === "fee-low") list.sort((a, b) => a.fee - b.fee);
+      if (state.sort === "fee-high") list.sort((a, b) => b.fee - a.fee);
+
+      renderDoctorGrid(list, grid);
+      resultsCount.textContent = `${list.length} doctor${list.length === 1 ? "" : "s"} found`;
+
+      // reflect active specialty chip
+      specialtyChips.querySelectorAll(".chip").forEach((c) => {
+        c.classList.toggle("active", c.dataset.specialty === state.specialty);
+      });
+    }
+
+    searchInput.addEventListener("input", () => {
+      state.q = searchInput.value;
+      applyFilters();
+    });
+    hospitalSelect.addEventListener("change", () => {
+      state.hospital = hospitalSelect.value;
+      applyFilters();
+    });
+    sortSelect.addEventListener("change", () => {
+      state.sort = sortSelect.value;
+      applyFilters();
+    });
+    specialtyChips.addEventListener("click", (e) => {
+      const chip = e.target.closest(".chip");
+      if (!chip) return;
+      state.specialty = chip.dataset.specialty;
+      applyFilters();
+    });
+
+    applyFilters(); }
