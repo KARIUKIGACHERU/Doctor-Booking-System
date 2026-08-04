@@ -1104,3 +1104,52 @@ footer a {
   color: var(--primary-dark);
   font-size: 1.15em;
 }
+
+/* ---------- Confirmation toast ---------- */
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 26px;
+  transform: translate(-50%, 120%);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 5px solid var(--success);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  padding: 16px 20px;
+  max-width: 400px;
+  width: calc(100% - 40px);
+  z-index: 120;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.toast.show {
+  transform: translate(-50%, 0);
+}
+
+.toast .icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--success-light);
+  color: var(--success);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.toast h4 {
+  margin: 0 0 3px;
+  color: var(--primary-dark);
+}
+
+.toast p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9em;
+}

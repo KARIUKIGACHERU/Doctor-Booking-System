@@ -599,3 +599,83 @@ function showToast(title, body) {
   clearTimeout(toast._t);
   toast._t = setTimeout(() => toast.classList.remove("show"), 4200);
 }
+
+/* ---------------- dashboard (booking.html) ---------------- */
+
+// Renders the "Your appointments" list on booking.html from whatever is
+// currently saved in localStorage, and wires up Cancel buttons that
+// remove an appointment and re-render. This is the dynamic, cross-page
+// link back to bookings made from the doctors.html search page.
+function renderDashboard(targetEl) {
+  const appointments = getAppointments().sort((a, b) =>
+    (a.date + a.time).localeCompare(b.date + b.time),
+  );
+
+  if (!appointments.length) {
+    targetEl.innerHTML = `
+      <div class="empty-dashboard">
+        <h3>No appointments yet</h3>
+        <p>Book a specialist and it will show up here.</p>
+        <br />
+        <a class="btn btn-primary" href="doctors.html">Find a doctor</a>
+      </div>`;
+    return;
+  }
+
+  targetEl.innerHTML = appointments
+    .map((a) => {
+      const col = specialtyColor(a.specialty);
+      return `
+      <div class="appt-card" data-id="${a.id}">
+        <div class="avatar" style="background:${col.bg};color:${col.fg}">${initials(a.doctorName)}</div>
+        <div class="appt-info">
+          <h3>${a.doctorName}</h3>
+          <p>${a.specialty} · ${a.hospital}, ${a.location}</p>
+        </div>
+        <div class="appt-datetime">
+          <div class="d">${fmtDateLabel(a.date)}</div>
+          <div class="t">${a.time}</div>
+        </div>
+        <span class="appt-status">Confirmed</span>
+        <button class="btn btn-danger-outline btn-sm js-cancel" data-id="${a.id}">Cancel</button>
+      </div>`;
+    })
+    .join("");
+
+  targetEl.querySelectorAll(".js-cancel").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.id;
+      const remaining = getAppointments().filter((a) => a.id !== id);
+      saveAppointments(remaining);
+      renderDashboard(targetEl);
+      showToast("Appointment cancelled", "Your slot has been freed up.");
+    });
+  });
+}
+
+  /* ---- booking.html: doctor picker + dashboard ---- */
+  const bookingSelect = document.getElementById("booking-doctor-select");
+  if (bookingSelect) {
+    bookingSelect.innerHTML =
+      '<option value="">Choose a doctor…</option>' +
+      DOCTORS.map((d) => `<option value="${d.id}">${d.name} — ${d.specialty}</option>`).join("");
+
+    // preselect from ?doctor=
+    const params = new URLSearchParams(window.location.search);
+    const preselect = params.get("doctor");
+    if (preselect) bookingSelect.value = preselect;
+
+    document.getElementById("booking-open-btn").addEventListener("click", () => {
+      if (!bookingSelect.value) {
+        alert("Please choose a doctor first.");
+        return;
+      }
+      openPanel(bookingSelect.value);
+    });
+  }
+
+  const dashboard = document.getElementById("appointment-dashboard");
+  if (dashboard) {
+    renderDashboard(dashboard);
+    document.addEventListener("appointments:changed", () => renderDashboard(dashboard));
+  }
