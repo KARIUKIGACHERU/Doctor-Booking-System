@@ -280,6 +280,7 @@ function renderDoctorGrid(list, targetEl) {
   }
   targetEl.innerHTML = list.map(doctorCardHTML).join("");
 }
+
 /* ---------------- page bootstraps ---------------- */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -368,4 +369,5 @@ document.addEventListener("DOMContentLoaded", () => {
       applyFilters();
     });
 
-    applyFilters(); }
+    applyFilters(); 
+}
