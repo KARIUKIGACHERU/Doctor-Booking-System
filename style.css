@@ -241,7 +241,7 @@ button {
 .hero {
   background:
     linear-gradient(100deg, rgba(15, 30, 48, 0.6) 0%, rgba(15, 30, 48, 0.3) 55%, rgba(15, 30, 48, 0.1) 100%),
-    url("./doctor.jpg") center 25% / cover no-repeat;
+    url("https://media.istockphoto.com/id/1678121723/photo/high-five-doctor-and-family-with-a-girl-and-her-parents-at-the-hospital-for-consulting.jpg?s=2048x2048&w=is&k=20&c=YfyWxcGphaNTJTEF-4vd7lcyNdHTsvDMhBEJ9azHJsM=") center 25% / cover no-repeat;
   padding: 56px 20px 40px;
   border-bottom: 1px solid var(--border);
 }
